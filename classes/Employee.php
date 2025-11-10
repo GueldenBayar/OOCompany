@@ -10,22 +10,23 @@ class Employee
     private int $departmentId;
     static int $counter = 0;
 
-    /**
-     * @param Gender $gender
-     * @param string $firstName
-     * @param string $lastName
-     * @param int $departmentId
-     */
-    public function __construct(Gender $gender, string $firstName, string $lastName, int $departmentId)
-    {
-        $this->gender = $gender;
-        $this->firstName = $firstName;
-        $this->lastName = $lastName;
-        $this->departmentId = $departmentId;
-        self::$counter++;
-        $this->id = self::$counter;
-    }
+    static array $employees = [];
 
+//    /**
+//     * @param Gender $gender
+//     * @param string $firstName
+//     * @param string $lastName
+//     * @param int $departmentId
+//     */
+//    public function __construct(Gender $gender, string $firstName, string $lastName, int $departmentId)
+//    {
+//        $this->gender = $gender;
+//        $this->firstName = $firstName;
+//        $this->lastName = $lastName;
+//        $this->departmentId = $departmentId;
+//        self::$counter++;
+//        $this->id = self::$counter;
+//    }
 
     public function getId(): int
     {
@@ -84,13 +85,30 @@ class Employee
     {
         return $this->departmentId;
     }
-    public static function getEmployees(): array {
-        return [
-            new Employee(Gender::W, 'Petra', 'Pan', 1),
-            new Employee(Gender::M, 'Peter', 'Pan', 2),
-            new Employee(Gender::D, 'Hans', 'Hanso', 3),
-            new Employee(Gender::W, 'Tom', 'Tomlinson', 1),
-            new Employee(Gender::D, 'Hansi', 'Hansonson', 3)
-        ];
+
+    public static function createEmployee(Gender $gender, string $firstName, string $lastName, int $departmentId) : Employee{
+        $e = new Employee();
+        $e-> gender = $gender;
+        $e->firstName = $firstName;
+        $e->lastName = $lastName;
+        $e->departmentId = $departmentId;
+        self::$counter++;
+        $e->id = self::$counter;
+        self::$employees = $e;
+
     }
+    public static function getEmployees(): array
+    {
+            self::createEmployee(Gender::W, 'Petra', 'Pan', 1);
+            self::createEmployee(Gender::M, 'Peter', 'Pan', 2);
+            self::createEmployee(Gender::D, 'Hans', 'Hanso', 3);
+            self::createEmployee(Gender::W, 'Tom', 'Tomlinson', 1);
+            self::createEmployee(Gender::D, 'Hansi', 'Hansonson', 3);
+            self::createEmployee(Gender::W, 'Bruni', 'Banani', 2);
+    }
+
+    public static function setEmployees(): void {
+
+    }
+
 }

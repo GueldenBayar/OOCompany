@@ -14,16 +14,16 @@ class Department
     /**
      * @param string $name
      */
-    public static function createDepartment(string $name)
+    public function __construct(string $name = null)
     {
-        $d = new Department();
-        $d->name = $name;
-        self::$counter++;
-        $d->id = self::$counter;
-        self::$departments[] = $d;
+        if (isset ($name)) {
+
+            $this->name = $name;
+            self::$counter++;
+            $this->id = self::$counter;
+            self::$departments[] = $this;
+        }
     }
-
-
     public function getId(): int
     {
         return $this->id;
@@ -33,7 +33,6 @@ class Department
     {
         return $this->name;
     }
-
     public function setName(string $name): void
     {
         $this->name = $name;
@@ -49,22 +48,29 @@ class Department
     }
 
     // alle erstellten departments auslesen
+
+    /**
+     * @return Department[]
+     */
     public static function getDepartments(): array{
         return self::$departments;
     }
 
-    public function getIdByName(string $name): int
+    public function getByName(string $name): ?Department
     {
+        $d = null;
         $departments = self::getDepartments();
         echo '<pre>';
         print_r($departments);
         echo '</pre>';
         foreach ($departments as $department) {
             if ($department->getName() === $name) {
-                return $department->getId();
+                $d = $department;
+            } else{
+                $d = null;
             }
-            return 0;
         }
+        return $d;
     }
 
 }
