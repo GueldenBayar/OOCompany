@@ -2,37 +2,32 @@
 
 class Employee
 {
-
-    private int $id;
-    private Gender $gender;
-    private string $firstName;
-    private string $lastName;
-    private int $departmentId;
-    static int $counter = 0;
+    private ?int $id;
+    private ?Gender $gender;
+    private ?string $firstName;
+    private ?string $lastName;
+    private ?int $departmentId;
+    static ?int $counter = 0;
 
     static array $employees = [];
 
-//    /**
-//     * @param Gender $gender
-//     * @param string $firstName
-//     * @param string $lastName
-//     * @param int $departmentId
-//     */
-//    public function __construct(Gender $gender, string $firstName, string $lastName, int $departmentId)
-//    {
-//        $this->gender = $gender;
-//        $this->firstName = $firstName;
-//        $this->lastName = $lastName;
-//        $this->departmentId = $departmentId;
-//        self::$counter++;
-//        $this->id = self::$counter;
-//    }
+    public function __construct(?Gender $gender=null, ?string $firstName=null, ?string $lastName=null, ?int $departmentId=null)
+    {
+        $this->gender = $gender;
+        self::$counter++;
+        $this->firstName = $firstName;
+        $this->lastName = $lastName;
+        $this->departmentId = $departmentId;
 
+        self::$counter++;
+        $this->id = self::$counter;
+
+        self::$employees[] = $this;
+    }
     public function getId(): int
     {
         return $this->id;
     }
-
     /**
      * @return string
      */
@@ -48,7 +43,6 @@ class Employee
     {
         $this->gender = $gender;
     }
-
     /**
      * @param string $firstName
      */
@@ -56,7 +50,6 @@ class Employee
     {
         $this->firstName = $firstName;
     }
-
     /**
      * @param string $lastName
      */
@@ -64,7 +57,6 @@ class Employee
     {
         $this->lastName = $lastName;
     }
-
     /**
      * @param int $departmentId
      */
@@ -72,7 +64,6 @@ class Employee
     {
         $this->departmentId = $departmentId;
     }
-
     public function getFirstName(): string
     {
         return $this->firstName;
@@ -85,30 +76,38 @@ class Employee
     {
         return $this->departmentId;
     }
-
-    public static function createEmployee(Gender $gender, string $firstName, string $lastName, int $departmentId) : Employee{
-        $e = new Employee();
-        $e-> gender = $gender;
-        $e->firstName = $firstName;
-        $e->lastName = $lastName;
-        $e->departmentId = $departmentId;
-        self::$counter++;
-        $e->id = self::$counter;
-        self::$employees = $e;
-
+    public static function setEmployees(): void
+    {
+        new Employee(Gender::W, 'Petra', 'Pan', 1);
+        new Employee(Gender::M, 'Peter', 'Pan', 2);
+        new Employee(Gender::D, 'Hans', 'Hanso', 3);
+        new Employee(Gender::W, 'Tom', 'Tomlinson', 1);
+        new Employee(Gender::D, 'Hansi', 'Hansonson', 3);
+        new Employee(Gender::W, 'Bruni', 'Banani', 2);
     }
+
+    /**
+     * @return Employee[]
+     */
     public static function getEmployees(): array
     {
-            self::createEmployee(Gender::W, 'Petra', 'Pan', 1);
-            self::createEmployee(Gender::M, 'Peter', 'Pan', 2);
-            self::createEmployee(Gender::D, 'Hans', 'Hanso', 3);
-            self::createEmployee(Gender::W, 'Tom', 'Tomlinson', 1);
-            self::createEmployee(Gender::D, 'Hansi', 'Hansonson', 3);
-            self::createEmployee(Gender::W, 'Bruni', 'Banani', 2);
+        return self::$employees;
     }
 
-    public static function setEmployees(): void {
+    /**
+     * @param Department $department
+     * @return Employee[]
+     */
+    public function getEmployeesByDepartments(Department $department): array {
 
+        $emps = [];
+        foreach (self::getEmployees() as $employee) {
+            echo $department->getId();
+            if($department->getId() === $employee->getDepartmentId()) {
+                $emps[] = $employee;
+            }
+        }
+        return $emps;
     }
 
 }
