@@ -76,17 +76,21 @@ class Employee
     {
         return $this->firstName;
     }
-
     public function getLastName(): string
     {
         return $this->lastName;
     }
-
     public function getDepartmentId(): int
     {
         return $this->departmentId;
     }
-
-
-
+    public static function getEmployees(): array {
+        return [
+            new Employee(Gender::W, 'Petra', 'Pan', 1),
+            new Employee(Gender::M, 'Peter', 'Pan', 2),
+            new Employee(Gender::D, 'Hans', 'Hanso', 3),
+            new Employee(Gender::W, 'Tom', 'Tomlinson', 1),
+            new Employee(Gender::D, 'Hansi', 'Hansonson', 3)
+        ];
+    }
 }

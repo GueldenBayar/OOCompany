@@ -5,27 +5,21 @@ include 'classes/Gender.php';
 include 'classes/Employee.php';
 
 // Kurzform
-$departments = [new Department('HR'),
-    new Department('Verkauf'),
-    new Department('Produktion')];
-echo '<pre>';
-print_r($departments);
-echo '</pre>';
+// Department::departments erstellen
+Department::setDepartments();
 
+// departments aufrufen
+$departments = Department::getDepartments();
 
-// ausführliche Form
-//$d1 = new Department('HR');
-//$d2 = new Department('Verkauf');
-//$d3 = new Department('Produktion');
 //
-//echo '<pre>';
-//print_r($d1);
-//print_r($d2);
-//print_r($d3);
-//echo '</pre>';
+$employees = Employee::getEmployees();
 
-$e = new Employee(Gender::W, 'Petra', 'Pan', 1);
+// Schreibe Funktion(en), die mir angibt, welche Mitarbeiter in 'HR' arbeiten
 
-echo '<pre>';
-print_r($e);
-echo '</pre>';
+// Weg: brauche index von HR aus departments
+// nehme index und filtere employees mit departmentId = 1
+
+// für index schreibe ich eine Funktion in der Klasse Department
+// brauche department-Objekt, um nicht-static Funktionen aufzurufen
+$d = $departments[0];
+echo $d->getIdByName('HR');
