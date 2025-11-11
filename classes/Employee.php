@@ -23,6 +23,19 @@ class Employee
         $this->id = self::$counter;
 
         self::$employees[] = $this;
+
+        //neuen Mitarbeiter dem Department hinzufügen
+        $this->assignToDepartment();
+    }
+
+    private function assignToDepartment(): void
+    {
+        foreach (Department::getDepartments() as $department) {
+            if ($department->getId() === $this->departmentId) {
+                $department->addEmployee($this);
+                break;
+            }
+        }
     }
     public function getId(): int
     {
@@ -110,4 +123,5 @@ class Employee
         return $emps;
     }
 
+    // mit der in php eingebauten array_filter funktion getEmployeesByDepartment ersetzen/einbauen
 }

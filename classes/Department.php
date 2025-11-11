@@ -11,6 +11,8 @@ class Department
 
     static array $departments = [];
 
+    private array $employees = [];
+
     /**
      * @param string $name
      */
@@ -45,6 +47,7 @@ class Department
         new Department('HR');
         new Department('Verkauf');
         new Department('Produktion');
+        new Department('play with dog');
     }
 
     // alle erstellten departments auslesen
@@ -70,6 +73,14 @@ class Department
             }
         }
         return $d;
+    }
+
+    public function addEmployee(Employee $employee): void{
+        $this->employees[] = $employee;
+    }
+
+    public function getEmployees(): array {
+        return $this->employees;
     }
 
 }
