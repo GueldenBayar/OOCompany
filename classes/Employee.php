@@ -123,5 +123,15 @@ class Employee
         return $emps;
     }
 
-    // mit der in php eingebauten array_filter funktion getEmployeesByDepartment ersetzen/einbauen
+    //Mitarbeiter, der bearbeitet werden soll finden:
+    public static function getById(int $id): ?Employee {
+        foreach (self::$employees as $employee) {
+            if ($employee->getId() === $id) {
+                return $employee;
+            }
+        }
+        return null;
+    }
+
+    // zusatz: mit der in php eingebauten array_filter funktion getEmployeesByDepartment ersetzen/einbauen
 }

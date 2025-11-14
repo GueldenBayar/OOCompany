@@ -49,16 +49,12 @@ class Department
         new Department('Produktion');
         new Department('play with dog');
     }
-
-    // alle erstellten departments auslesen
-
     /**
      * @return Department[]
      */
     public static function getDepartments(): array{
         return self::$departments;
     }
-
     public function getByName(string $name): ?Department
     {
         $d = null;
@@ -83,4 +79,12 @@ class Department
         return $this->employees;
     }
 
+    public static function getById(int $id): ?Department{
+        foreach (self::$departments as $department) {
+            if ($department->getId() === $id) {
+                return $department;
+            }
+        }
+        return null;
+    }
 }
