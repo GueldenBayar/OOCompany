@@ -1,8 +1,17 @@
 <?php
 
-include 'classes/Department.php';
-include 'classes/Gender.php';
-include 'classes/Employee.php';
+spl_autoload_register(function($class) {
+    $path = __DIR__ . "/classes/" . $class . ".php";
+
+    if (file_exists($path)) {
+        require_once $path;
+    }
+});
+
+echo "<pre>";
+$test = new Department("Product Design");
+var_dump($test);
+echo "</pre>";
 
 // Departments einmalig anlegen
 Department::setDepartments();
@@ -232,6 +241,36 @@ switch($action) {
 
     default:
         $content .= "<h1>page not found :( </h1>";
+}
+
+$depArr = Department::getDepartments();
+
+$fp = fopen("departments.csv", "w");
+
+//Header
+fputcsv($fp, ["ID", "Name"], ';');
+
+foreach ($depArr as $department) {
+
+//    var_dump($department);
+
+    fputcsv($fp, [
+            $department->getID(),
+            $department->getName()
+    ],';');
+}
+
+fclose($fp);
+
+$empArr = Employee::getEmployees();
+
+$fp = fopen("employees.csv", "w");
+
+//Header
+fputcsv($fp, ["ID", "First Name", "Last Name", "Gender", "Department"], ';');
+
+foreach ($empArr as $emp) {
+
 }
 
 ?>
