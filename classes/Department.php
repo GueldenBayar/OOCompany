@@ -2,30 +2,35 @@
 
 class Department
 {
-    // wie PK
     private int $id;
-
     private ?string $name;
-
     static int $counter = 0;
-
     static array $departments = [];
-
     private array $employees = [];
 
     /**
      * @param string $name
      */
-    public function __construct(?string $name = null)
+    public function __construct(string $name = null, ?int $id = null)
     {
         if (isset ($name)) {
 
             $this->name = $name;
-            self::$counter++;
-            $this->id = self::$counter;
+            if (!isset($id)) {
+                self::$counter++;
+                $this->id = self::$counter;
+            } else {
+                $this->id = $id;
+            }
             self::$departments[] = $this;
         }
     }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+
     public function getId(): int
     {
         return $this->id;
@@ -35,6 +40,7 @@ class Department
     {
         return $this->name;
     }
+
     public function setName(string $name): void
     {
         $this->name = $name;
@@ -49,12 +55,15 @@ class Department
         new Department('Produktion');
         new Department('play with dog');
     }
+
     /**
      * @return Department[]
      */
-    public static function getDepartments(): array{
+    public static function getDepartments(): array
+    {
         return self::$departments;
     }
+
     public function getByName(string $name): ?Department
     {
         $d = null;
@@ -71,15 +80,18 @@ class Department
         return $d;
     }
 
-    public function addEmployee(Employee $employee): void{
+    public function addEmployee(Employee $employee): void
+    {
         $this->employees[] = $employee;
     }
 
-    public function getEmployees(): array {
+    public function getEmployees(): array
+    {
         return $this->employees;
     }
 
-    public static function getById(int $id): ?Department{
+    public static function getById(int $id): ?Department
+    {
         foreach (self::$departments as $department) {
             if ($department->getId() === $id) {
                 return $department;
@@ -87,4 +99,5 @@ class Department
         }
         return null;
     }
+
 }

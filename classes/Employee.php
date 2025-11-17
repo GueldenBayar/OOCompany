@@ -7,7 +7,7 @@ class Employee
     private ?string $firstName;
     private ?string $lastName;
     private ?int $departmentId;
-    static ?int $counter = 0;
+    static int $counter = 0;
 
     static array $employees = [];
 
@@ -133,5 +133,5 @@ class Employee
         return null;
     }
 
-    // zusatz: mit der in php eingebauten array_filter funktion getEmployeesByDepartment ersetzen/einbauen
+
 }

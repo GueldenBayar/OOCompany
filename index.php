@@ -8,11 +8,6 @@ spl_autoload_register(function($class) {
     }
 });
 
-echo "<pre>";
-$test = new Department("Product Design");
-var_dump($test);
-echo "</pre>";
-
 // Departments einmalig anlegen
 Department::setDepartments();
 // Employees anlegen (die sich dann selbst ins richtige Department einsortieren)
@@ -170,9 +165,9 @@ switch($action) {
 
         //Dropdown Gender
         $content .= "Gender: <select name='gender'>";
-        $content .= "<option value='female'>Female</option>";
-        $content .= "<option value='male'>Male</option>";
-        $content .= "<option value='divers'>Divers</option>";
+        $content .= "<option value='W'>Female</option>";
+        $content .= "<option value='M'>Male</option>";
+        $content .= "<option value='D'>Divers</option>";
         $content .= "</select>";
 
         //Dropdown Departments, dynamisch
@@ -197,7 +192,7 @@ switch($action) {
             break;
         }
 
-        if ($_SERVER['REQUEST_METHOD' === 'POST']) {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $emp->setFirstName($_POST['firstName']);
             $emp->setLastName($_POST['lastName']);
             $emp->setDepartmentId((int)$_POST['deptId']);
@@ -241,36 +236,6 @@ switch($action) {
 
     default:
         $content .= "<h1>page not found :( </h1>";
-}
-
-$depArr = Department::getDepartments();
-
-$fp = fopen("departments.csv", "w");
-
-//Header
-fputcsv($fp, ["ID", "Name"], ';');
-
-foreach ($depArr as $department) {
-
-//    var_dump($department);
-
-    fputcsv($fp, [
-            $department->getID(),
-            $department->getName()
-    ],';');
-}
-
-fclose($fp);
-
-$empArr = Employee::getEmployees();
-
-$fp = fopen("employees.csv", "w");
-
-//Header
-fputcsv($fp, ["ID", "First Name", "Last Name", "Gender", "Department"], ';');
-
-foreach ($empArr as $emp) {
-
 }
 
 ?>
