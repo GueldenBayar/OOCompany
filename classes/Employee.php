@@ -11,10 +11,9 @@ class Employee
 
     static array $employees = [];
 
-    public function __construct(?Gender $gender=null, ?string $firstName=null, ?string $lastName=null, ?int $departmentId=null)
+    public function __construct(?Gender $gender = null, ?string $firstName = null, ?string $lastName = null, ?int $departmentId = null)
     {
         $this->gender = $gender;
-        self::$counter++;
         $this->firstName = $firstName;
         $this->lastName = $lastName;
         $this->departmentId = $departmentId;
@@ -37,16 +36,18 @@ class Employee
             }
         }
     }
+
     public function getId(): int
     {
         return $this->id;
     }
+
     /**
      * @return string
      */
     public function getGender(): string
     {
-        return $this->gender->value;
+        return $this->gender?->value ?? '';
     }
 
     /**
@@ -56,6 +57,7 @@ class Employee
     {
         $this->gender = $gender;
     }
+
     /**
      * @param string $firstName
      */
@@ -63,6 +65,7 @@ class Employee
     {
         $this->firstName = $firstName;
     }
+
     /**
      * @param string $lastName
      */
@@ -70,6 +73,7 @@ class Employee
     {
         $this->lastName = $lastName;
     }
+
     /**
      * @param int $departmentId
      */
@@ -77,26 +81,33 @@ class Employee
     {
         $this->departmentId = $departmentId;
     }
+
     public function getFirstName(): string
     {
         return $this->firstName;
     }
+
     public function getLastName(): string
     {
         return $this->lastName;
     }
+
     public function getDepartmentId(): int
     {
         return $this->departmentId;
     }
+
     public static function setEmployees(): void
     {
-        new Employee(Gender::W, 'Petra', 'Pan', 1);
-        new Employee(Gender::M, 'Peter', 'Pan', 2);
-        new Employee(Gender::D, 'Hans', 'Hanso', 3);
-        new Employee(Gender::W, 'Tom', 'Tomlinson', 1);
-        new Employee(Gender::D, 'Hansi', 'Hansonson', 3);
-        new Employee(Gender::W, 'Bruni', 'Banani', 2);
+        //Beispiel Mitarbeiter nur einmal
+        if (count(self::$employees) === 0) {
+            new Employee(Gender::W, 'Petra', 'Pan', 1);
+            new Employee(Gender::M, 'Peter', 'Pan', 2);
+            new Employee(Gender::D, 'Hans', 'Hanso', 3);
+            new Employee(Gender::W, 'Tom', 'Tomlinson', 1);
+            new Employee(Gender::D, 'Hansi', 'Hansonson', 3);
+            new Employee(Gender::W, 'Bruni', 'Banani', 2);
+        }
     }
 
     /**
@@ -107,16 +118,36 @@ class Employee
         return self::$employees;
     }
 
+    public static function deleteByDepartmentId(int $departmentId): void {
+        //löscht alle Mitarbeiter mit dieser AbteilungsId
+        foreach (self::employees as $idx => $employee) {
+            if ($employee->getDepartmentId() === $departmentId) {
+                array_splice(self::$employees, $idx, 1);
+                // ein element wurde entfernt, indexes wurden versetzt - der loop beginnt von vorne
+                self::deleteByDepartmentId($departmentId);
+                return;
+            }
+        }
+    }
+
+    public static function deleteById(int $id):void {
+        foreach (self::employees as $idx => $employee) {
+            if ($employee->getId() === $id) {
+                array_splice(self::$employees, $idx, 1);
+                return;
+            }
+        }
+    }
+
     /**
      * @param Department $department
      * @return Employee[]
      */
-    public function getEmployeesByDepartments(Department $department): array {
-
+    public function getEmployeesByDepartments(Department $department): array
+    {
         $emps = [];
         foreach (self::getEmployees() as $employee) {
-            echo $department->getId();
-            if($department->getId() === $employee->getDepartmentId()) {
+            if ($department->getId() === $employee->getDepartmentId()) {
                 $emps[] = $employee;
             }
         }
@@ -124,7 +155,8 @@ class Employee
     }
 
     //Mitarbeiter, der bearbeitet werden soll finden:
-    public static function getById(int $id): ?Employee {
+    public static function getById(int $id): ?Employee
+    {
         foreach (self::$employees as $employee) {
             if ($employee->getId() === $id) {
                 return $employee;
@@ -132,6 +164,4 @@ class Employee
         }
         return null;
     }
-
-
 }

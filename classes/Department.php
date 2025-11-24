@@ -21,6 +21,10 @@ class Department
                 $this->id = self::$counter;
             } else {
                 $this->id = $id;
+                // sicherstellen, dass counter mindestens id ist um duplikate zu vermeiden
+                if ($id > self::$counter) {
+                    self::$counter = $id;
+                }
             }
             self::$departments[] = $this;
         }
@@ -50,10 +54,13 @@ class Department
 // alle departments als Array erstellen und in self $departments schreiben
     public static function setDepartments(): void
     {
-        new Department('HR');
-        new Department('Verkauf');
-        new Department('Produktion');
-        new Department('play with dog');
+        //nur einmal aufrufen, Initialisierung
+        if (count(self::$departments) === 0) {
+            new Department('HR');
+            new Department('Verkauf');
+            new Department('Produktion');
+            new Department('play with dog');
+        }
     }
 
     /**
@@ -64,21 +71,21 @@ class Department
         return self::$departments;
     }
 
-    public function getByName(string $name): ?Department
-    {
-        $d = null;
-        $departments = self::getDepartments();
-        echo '<pre>';
-        print_r($departments);
-        echo '</pre>';
-        foreach ($departments as $department) {
-
-            if ($department->getName() === $name) {
-                $d = $department;
-            }
-        }
-        return $d;
-    }
+//    public function getByName(string $name): ?Department
+//    {
+//        $d = null;
+//        $departments = self::getDepartments();
+//        echo '<pre>';
+//        print_r($departments);
+//        echo '</pre>';
+//        foreach ($departments as $department) {
+//
+//            if ($department->getName() === $name) {
+//                $d = $department;
+//            }
+//        }
+//        return $d;
+//    }
 
     public function addEmployee(Employee $employee): void
     {
@@ -100,4 +107,17 @@ class Department
         return null;
     }
 
+    // Löscht ein Department und entfernt Relation zu Employees
+    public static function deleteById(int $id): void {
+        foreach (self::$departments as $idx => $department) {
+            if ($department -> getId() === $id) {
+                //Mitarbeiter, die zu dieser Abteilung gehören löschen
+                Employee::deleteByDepartment($id);
+
+                // Department entfernen
+                array_splice(self::$departments, $idx, 1);
+                return;
+            }
+        }
+    }
 }

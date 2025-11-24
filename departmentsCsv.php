@@ -48,3 +48,35 @@ if (($handle = fopen($filename, "r")) !== false) {
     echo 'else';
 }
 
+$ueberschriften = ['ID', 'Abteilungsname'];
+
+//Daten auspacken, $deppArr enthält Objekte, diese in einfache Liste umwandeln
+
+$tabellenDaten = [];
+
+foreach ($deppArr as $departmentObject) {
+    $zeile = [
+        $departmentObject->getId(),
+        $departmentObject->getName()
+    ];
+
+    $tabellenDaten[] = $zeile;
+}
+
+//Ausgabe
+
+echo "<h1>AbteilungenÜbersicht</h1>";
+
+//rufe den Roboter
+
+echo HtmlHelper::baueTabelle($ueberschriften, $tabellenDaten, '', '');
+
+
+
+
+
+
+
+
+
+
