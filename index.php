@@ -13,27 +13,25 @@ Department::setDepartments();
 Employee::setEmployees();
 
 //was will der user? Router
-//null coalescing operator - $action = $_GET['action'] ?? 'home'; Vergleicht, ob $_GET['action'] isset and not null dann bekommt $action die $_GET['action']
-if (isset($_GET['action'])) {
-    $action = $_GET['action'];
-} else {
-    $action = 'home';
-}
-$content = "";
+//null coalescing operator; Vergleicht, ob $_GET['action'] isset and not null dann bekommt $action die $_GET['action']
+//if (isset($_GET['action'])) {
+//    $action = $_GET['action'];
+//} else {
+//    $action = 'home';
+//}
+$action = $_GET['action'] ?? 'home';
+$viewParams = [];
+$viewPath = 'views/home.php'; // Standard View
 
 //HTML code in die variable $content schreiben .= , somit bleibt mein html code unten sauber
 switch ($action) {
 
     case 'home':
-        $content .= "<h1>Welcome :)</h1>";
+        $viewPath = 'views/home.php';
         break;
 
     case 'departments':
-        //Start der Tabelle
-        $content .= "<h1>Departments</h1>";
-
         $departments = Department::getDepartments();
-
         $tabelleDaten = [];
         //Schleife durch alle Abteilungen
         foreach ($departments as $d) {
@@ -42,25 +40,22 @@ switch ($action) {
                     $d->getName()
             ];
         }
+        // Daten für View vorbereiten
+        $viewParams['tableHtml'] = '';
         if (count($tabelleDaten) > 0) {
-            $content .= HtmlHelper::baueTabelle(
+            $viewParams['tableHtml'] = HtmlHelper::baueTabelle(
                     ['ID', 'Name'],
                     $tabelleDaten,
                     'edit_dept',
                     'delete_dept'
             );
-        } else {
-            $content .= "<p>Keine Abteilungen gefunden.</p>";
         }
 
-        $content .= "<br><a href='index.php?action=new_dept' class='btn'>+new Department</a>";
+        $viewPath = 'views/department_list.php';
         break;
 
-
     case 'employees':
-        $content .= "<h1>Employees</h1>";
         $employees = Employee::getEmployees();
-
         $tabelleDaten = [];
 
         foreach ($employees as $e) {
@@ -77,70 +72,56 @@ switch ($action) {
                     $deptName
             ];
         }
+
+        $viewParams['tableHtml'] = '';
         if (count($tabelleDaten) > 0) {
-            $content .= HtmlHelper::baueTabelle(
-                    ['ID', 'Name', 'Gender', 'Department'],
-                    $tabelleDaten,
-                    'edit_emp',
-                    'delete_emp'
+            $viewParams['tableHtml'] = HtmlHelper::baueTabelle(
+                    ['ID', 'Name', 'Gender', 'Department'], $tabelleDaten, 'edit_emp', 'delete_emp'
             );
-        } else {
-            $content .= "<p>Keine Mitarbeiter gefunden.</p>";
         }
-        $content .= "<br><a href='index.php?action=new_employee' class='btn'>+ Neuer Mitarbeiter</a>";
+        $viewPath = 'views/employee_list.php';
         break;
 
-
-    // --- NEW DEPARTMENT ---
     case 'new_dept':
         // wurde das Formular abgeschickt?
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $name = $_POST['dept_name'];
+            $name = $_POST['dept_name'] ?? '';
             //neue Abteilung landet im Array
-            if ($name !== '') {
-                new Department($name);
-            }
+            if ($name !== '') new Department($name);
             header('Location: index.php?action=departments');
             exit;
         }
 
-        //Formular anzeigen
-        $content .= "<h1>New Department</h1>";
-        $content .= "<form action='index.php?action=new_dept' method='POST'>";
-
-        $content .= "Name: <input type='text' name='dept_name' required><br><br>";
-        $content .= "<button type='submit' class='btn'>Save</button>";
-        $content .= "</form>";
+        $viewPath = 'views/department_form.php';
+        // Setze Variablen für das Formular leer bei Neu
+        $viewParams['headline'] = 'New Department';
+        $viewParams['formAction'] = 'index.php?action=new_dept';
+        $viewParams['deptName'] = '';
         break;
 
-    //Abteilung bearbeiten
     case 'edit_dept':
         //welche ID wollen wir bearbeiten?
         $id = (int)($_GET['id'] ?? 0);
         $dept = Department::getById($id);
 
         if (!$dept) {
-            $content .= "Department not found";
+            $viewPath = 'views/404.php';
             break;
         }
 
         //speichern
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $newName = $_POST['dept_name'] ?? '';
-            if ($newName !== '') {
-                $dept->setName($newName);
-            }
+            if ($newName !== '') $dept->setName($newName);
             header('Location:index.php?action=departments');
             exit;
         }
 
-        //Formular mit alten Daten vorbefüllen
-        $content .= "<h1>Edit Department</h1>";
-        //wichtig: action muss die id behalten!
-        $content .= "<form action='index.php?action=edit_dept&id=$id' method='POST'>";
-        $content .= "Name <input type='text' name='dept_name' value='" . htmlspecialchars($dept->getName()) . "' required><br><br>";
-        $content .= "<button type='submit' class='btn'>Save changes</button>";
-        $content .= "</form>";
+        $viewPath = 'views/department_form.php';
+        // Wiederverwendung des Formular-Views
+        $viewParams['headline'] = 'Edit Department';
+        $viewParams['formAction'] = "index.php?action=edit_dept&id=$id";
+        $viewParams['deptName'] = $dept->getName();
         break;
 
     case 'delete_dept':
@@ -148,62 +129,39 @@ switch ($action) {
         Department::deleteById($id);
         header('Location: index.php?action=departments');
         exit;
-        break;
 
-    // --- NEW EMPLOYEE ---
     case 'new_employee':
         //alle Dept für das Dropdown Menü
-        $allDepts = Department::getDepartments();
-
+//        $allDepts = Department::getDepartments();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             //Daten aus dem Formular holen
             $firstName = $_POST['firstName'] ?? '';
             $lastName = $_POST['lastName'] ?? '';
             $deptId = (int)$_POST['deptId'] ?? 0;
-
             // Gender: Wert senden, zB weibl
             $genderVal = $_POST['gender'] ?? '';
-
             // tryFrom: sicherer, falls falscher Wert kommt
             $genderEnum = Gender::tryFrom($genderVal) ?? null;
 
             new Employee($genderEnum, $firstName, $lastName, $deptId);
-
             header('Location: index.php?action=employees');
             exit;
         }
 
-        $content .= "<h1>New Employee</h1>";
-        $content .= "<form action='index.php?action=new_employee' method='POST'>";
-        $content .= "First Name: <input type='text' name='firstName' required><br>";
-        $content .= "Last Name: <input type='text' name='lastName' required><br>";
-
-        //Dropdown Gender
-        $content .= "Gender: <select name='gender'>";
-        $content .= "<option value='" . Gender::W->value . "'>Female</option>";
-        $content .= "<option value='" . Gender::M->value . "'>Male</option>";
-        $content .= "<option value='" . Gender::D->value . "'>Divers</option>";
-        $content .= "</select><br>";
-
-        //Dropdown Departments, dynamisch
-        $content .= "Abteilung: <select name='deptId'>";
-        foreach ($allDepts as $d) {
-            $content .= "<option value='" . $d->getId() . "'>" . htmlspecialchars($d->getName()) . "</option>";
-        }
-        $content .= "</select><br><br>";
-
-        $content .= "<button type='submit' class='btn'>New</button>";
-        $content .= "</form>";
+        $viewPath = 'views/employee_form.php';
+        $viewParams['headline'] = 'New Employee';
+        $viewParams['formAction'] = 'index.php?action=new_employee';
+        $viewParams['emp'] = null; // Kein Mitarbeiter Objekt vorhanden
+        $viewParams['allDepts'] = Department::getDepartments();
         break;
 
-    //Edit Employee
     case 'edit_emp':
         $id = (int)($_GET['id'] ?? 0);
         $emp = Employee::getById($id);
-        $allDepts = Department::getDepartments(); //für das Dropdown Menü
+        //allDepts = Department::getDepartments(); //für das Dropdown Menü
 
         if (!$emp) {
-            $content .= "Employee not found!";
+            $viewPath = 'views/404.php';
             break;
         }
 
@@ -213,55 +171,35 @@ switch ($action) {
             $emp->setDepartmentId((int)$_POST['deptId'] ?? 0);
             $genderVal = $_POST['gender'] ?? '';
             $genderEnum = Gender::tryFrom($genderVal) ?? $emp->getGender();
-            if ($genderEnum instanceof Gender) {
-                $emp->setGender($genderEnum);
-            }
+            if ($genderEnum instanceof Gender) $emp->setGender($genderEnum);
+
             header('Location: index.php?action=employees');
             exit;
         }
 
-        $content .= "<h1>Edit Employee</h1>";
-        $content .= "<form action='index.php?action=edit_emp&id=$id' method='POST'>";
-
-        //Vorbefüllen der Textfelder
-        $content .= "First Name: <input type='text' name='firstName' value='" . $emp->getFirstName() . "'><br>";
-        $content .= "Last Name: <input type='text' name='lastName' value='" . $emp->getLastName() . "'><br>";
-
-        //Vorbefüllen Abteilung Dropdown
-        $selW = ($emp->getGender() === Gender::W->value) ? 'selected' : '';
-        $selM = ($emp->getGender() === Gender::M->value) ? 'selected' : '';
-        $selD = ($emp->getGender() === Gender::D->value) ? 'selected' : '';
-
-        $content .= "Gender: <select name='gender'>";
-        $content .= "<option value='" . Gender::W->value . "' $selW>Female</option>";
-        $content .= "<option value='" . Gender::M->value . "' $selM>Male</option>";
-        $content .= "<option value='" . Gender::D->value . "' $selD>Divers</option>";
-        $content .= "</select><br>";
-
-        //Vorbefüllen Departments dropdown
-        $content .= "Department: <select name='deptId'>";
-        foreach ($allDepts as $d) {
-            //ist das die richtige Abteilung des Mitarbeiters, dann wähle sie aus
-            $isSelected = ($d->getId() === $emp->getDepartmentId()) ? 'selected' : '';
-            $content .= "<option value='" . $d->getId() . "' $isSelected>" . $d->getName() . "</option>";
-        }
-        $content .= "</select><br><br>";
-
-        $content .= "<button type='submit' class='btn'>Save</button>";
-        $content .= "</form>";
+        $viewPath = 'views/employee_form.php';
+        $viewsParams['headline'] = 'Edit Employee';
+        $viewsParams['formAction'] = 'index.php?action=edit_emp&id=$id';
+        $viewParams['emp'] = $emp;
+        $viewParams['allDepts'] = Department::getDepartments();
         break;
 
-        // --- Delete Employee ---
     case 'delete_emp':
         $id = (int)($_GET['id'] ?? 0);
         Employee::deleteById($id);
         header('Location: index.php?action=employees');
         exit;
-        break;
 
     default:
-        $content .= "<h1>page not found :( </h1>";
+        $viewPath = 'views/404.php';
 }
+
+// Hier entpacken wir das Array in echte Variablen
+// z.B. wird $viewParams['headline'] zu $headline
+extract($viewParams);
+
+// Layout laden, das Layout lädt dann den $viewPath
+require 'views/layout.php';
 
 ?>
 
