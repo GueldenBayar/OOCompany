@@ -13,7 +13,12 @@ Department::setDepartments();
 Employee::setEmployees();
 
 //was will der user? Router
-$action = $_GET['action'] ?? 'home';
+//null coalescing operator - $action = $_GET['action'] ?? 'home'; Vergleicht, ob $_GET['action'] isset and not null dann bekommt $action die $_GET['action']
+if (isset($_GET['action'])) {
+    $action = $_GET['action'];
+} else {
+    $action = 'home';
+}
 $content = "";
 
 //HTML code in die variable $content schreiben .= , somit bleibt mein html code unten sauber
