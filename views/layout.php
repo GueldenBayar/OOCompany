@@ -54,8 +54,8 @@
 </head>
 <body>
     <nav>
-        <a href="index.php?action=departments">Departments</a>
-        <a href="index.php?action=employees">Employees</a>
+        <a href="../index.php?action=departments">Departments</a>
+        <a href="../index.php?action=employees">Employees</a>
     </nav>
     <div>
         <?php include $viewPath; ?>

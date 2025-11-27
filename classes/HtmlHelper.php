@@ -61,4 +61,4 @@ class HtmlHelper
 }
 
 //Die erste Schleife geht von oben nach unten (Zeile 1, Zeile 2, Zeile 3)
-//Die zweite Schleife geht innerhalb der Zeile von links nach rechts (Zelle 1, Zelle 2, Zelle 3)
+//Die zweite Schleife geht innerhalb der Zeile von links nach rechts (Zgithugitelle 1, Zelle 2, Zelle 3)
